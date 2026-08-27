@@ -1,0 +1,109 @@
+site_name: CaDS Summer School
+site_description: Von der offenen API zum eigenen Harness — mit einem kleinen, selbst gehosteten Sprachmodell
+site_url: https://scimbe.github.io/CaDS-SummerSchool/
+repo_url: https://github.com/scimbe/CaDS-SummerSchool
+repo_name: scimbe/CaDS-SummerSchool
+edit_uri: edit/main/docs/
+
+# Die Doku folgt Diátaxis: Vier Arten von Text beantworten vier verschiedene
+# Fragen, und sie zu vermischen ist der häufigste Grund, warum Doku verrottet.
+#
+#   Tutorials     "bring es mir bei"   lernend, an der Hand, ein Weg der klappt
+#   How-to        "hilf mir bei X"     aufgabenorientiert, setzt Können voraus
+#   Referenz      "sag mir was gilt"   nachschlagend, trocken, vollständig
+#   Erklärung     "warum ist das so"   verstehend, Begründung und Zusammenhang
+#
+# Beim Anlegen einer Seite zuerst entscheiden, welche der vier Fragen sie
+# beantwortet. Eine Seite, die zwei beantwortet, gehört in zwei Dateien.
+
+theme:
+  name: material
+  language: de
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Zu dunkel wechseln
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Zu hell wechseln
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - content.code.copy
+    - content.action.edit
+    - search.highlight
+    - search.suggest
+    - toc.follow
+
+extra_css:
+  - stylesheets/cads.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search:
+      lang: de
+
+nav:
+  - Start: index.md
+  - Tutorials:
+      - tutorials/index.md
+      - 1 — Die erste Anfrage: tutorials/erste-anfrage.md
+      - 2 — Der erste Bericht: tutorials/erster-bericht.md
+      - 3 — Die erste Oberfläche: tutorials/erste-oberflaeche.md
+  - How-to:
+      - how-to/index.md
+      - Endpunkt einrichten: how-to/endpunkt-einrichten.md
+      - Eigene Städte und Schadstoffe: how-to/eigene-auswahl.md
+      - Das Harness anpassen: how-to/harness-anpassen.md
+      - PDF-Erzeugung umstellen: how-to/pdf-werkzeug.md
+      - Fehler suchen: how-to/fehler-suchen.md
+      - Auf eigene Daten übertragen: how-to/eigene-api.md
+  - Referenz:
+      - reference/index.md
+      - Version-1 — Skripte: reference/version-1.md
+      - Version-2 — Bericht: reference/version-2.md
+      - Version-3 — Oberfläche: reference/version-3.md
+      - Der Endpunkt: reference/endpunkt.md
+      - Die Luftqualitäts-API: reference/luftqualitaet-api.md
+      - Einstufung und Grenzwerte: reference/einstufung.md
+  - Erklärung:
+      - explanation/index.md
+      - Was ein Harness ist: explanation/was-ist-ein-harness.md
+      - Warum das Modell nicht rechnet: explanation/kein-rechnen.md
+      - Der Hebel: explanation/der-hebel.md
+      - Was Prüfen nicht kann: explanation/grenzen-der-pruefung.md
+      - Warum OpenAI-kompatibel wichtig ist: explanation/openai-kompatibel.md
+      - Regeln in einer Datei: explanation/regeln-als-datei.md

@@ -1,0 +1,264 @@
+/* Oberfläche für Version-3. Bewusst ohne Framework: Alles, was hier passiert,
+   ist mit Bordmitteln nachvollziehbar. Die Farben sind die von CaDS. */
+
+:root {
+  --blau: #204c86;
+  --blau-dunkel: #12305a;
+  --blau-hell: #eaf0f8;
+  --gruen: #9cb33b;
+  --rand: #d8e0ea;
+  --grund: #ffffff;
+  --grund-weich: #f5f8fc;
+  --text: #1a1d22;
+  --text-leise: #5d6874;
+  --radius: 10px;
+  --schatten: 0 1px 2px rgba(18, 48, 90, .06), 0 4px 16px rgba(18, 48, 90, .06);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--grund-weich);
+}
+
+code, pre, .code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+/* ---------------------------------------------------------------- Kopf --- */
+
+.kopf {
+  background: linear-gradient(180deg, var(--blau) 0%, var(--blau-dunkel) 100%);
+  color: #fff;
+  padding: 26px 0 30px;
+}
+.kopf-inhalt { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+.kopf h1 { margin: 0; font-size: 26px; letter-spacing: -.02em; font-weight: 700; }
+.kopf .leicht { font-weight: 300; opacity: .82; }
+.unterzeile { margin: 6px 0 0; font-size: 14px; opacity: .88; max-width: 68ch; }
+.unterzeile code { background: rgba(255,255,255,.16); padding: 1px 5px; border-radius: 4px; }
+
+/* -------------------------------------------------------------- Raster --- */
+
+.raster {
+  max-width: 1280px;
+  margin: -14px auto 0;
+  padding: 0 24px 40px;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 940px) { .raster { grid-template-columns: 1fr; } }
+
+.steuerung { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 14px; }
+@media (max-width: 940px) { .steuerung { position: static; } }
+
+.feld, .ergebnis {
+  background: var(--grund);
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 16px 18px;
+}
+.feld h2, .ergebnis h2 {
+  margin: 0 0 4px; font-size: 13px; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--blau); font-weight: 700;
+}
+.hilfe { margin: 0 0 10px; font-size: 12.5px; color: var(--text-leise); }
+
+/* -------------------------------------------------------------- Hebel ---- */
+
+.hebel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0 8px; }
+.hebel-stufe {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 9px 4px; border: 1.5px solid var(--rand); background: var(--grund);
+  border-radius: 8px; cursor: pointer; font: inherit; color: var(--text-leise);
+  transition: all .12s ease;
+}
+.hebel-stufe:hover { border-color: var(--blau); }
+.hebel-stufe.aktiv {
+  border-color: var(--blau); background: var(--blau); color: #fff;
+  box-shadow: 0 2px 8px rgba(32, 76, 134, .28);
+}
+.hebel-nr { font-size: 16px; font-weight: 700; line-height: 1; }
+.hebel-name { font-size: 11.5px; font-weight: 600; }
+.hebel-erklaerung {
+  margin: 0; font-size: 12.5px; color: var(--text-leise);
+  background: var(--blau-hell); border-radius: 7px; padding: 8px 10px;
+  border-left: 3px solid var(--blau);
+}
+
+/* ---------------------------------------------------- Eingabeelemente ---- */
+
+textarea, input[type="search"], select {
+  width: 100%; font: inherit; color: var(--text);
+  padding: 8px 10px; border: 1px solid var(--rand); border-radius: 8px;
+  background: var(--grund); resize: vertical;
+}
+textarea:focus, input:focus, select:focus {
+  outline: none; border-color: var(--blau); box-shadow: 0 0 0 3px rgba(32,76,134,.12);
+}
+.etikett {
+  display: block; margin: 14px 0 5px; font-size: 12px; font-weight: 600;
+  color: var(--text-leise); text-transform: uppercase; letter-spacing: .04em;
+}
+.zaehler { color: var(--blau); font-weight: 700; text-transform: none; letter-spacing: 0; }
+
+.knopf {
+  font: inherit; font-weight: 600; cursor: pointer;
+  padding: 9px 14px; border-radius: 8px; border: 1px solid var(--rand);
+  background: var(--grund); color: var(--text); transition: all .12s ease;
+}
+.knopf:hover { border-color: var(--blau); }
+.knopf-haupt {
+  width: 100%; margin-top: 12px; background: var(--blau); color: #fff; border-color: var(--blau);
+}
+.knopf-haupt:hover { background: var(--blau-dunkel); border-color: var(--blau-dunkel); }
+.knopf[disabled] { opacity: .45; cursor: not-allowed; }
+.feld[data-aus="ja"] { opacity: .5; pointer-events: none; }
+
+/* -------------------------------------------------------------- Chips ---- */
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip {
+  font: inherit; font-size: 12.5px; cursor: pointer;
+  padding: 4px 9px; border-radius: 999px;
+  border: 1px solid var(--rand); background: var(--grund-weich); color: var(--text-leise);
+}
+.chip:hover { border-color: var(--blau); color: var(--blau); }
+.chip-gewaehlt {
+  background: var(--blau); border-color: var(--blau); color: #fff; font-weight: 600;
+}
+.chip-gewaehlt .weg { margin-left: 5px; opacity: .75; }
+
+.vorschlaege {
+  margin-top: 6px; max-height: 190px; overflow-y: auto;
+  border: 1px solid var(--rand); border-radius: 8px; background: var(--grund);
+}
+.vorschlag {
+  display: flex; justify-content: space-between; gap: 8px; width: 100%;
+  padding: 6px 10px; border: 0; background: none; font: inherit; text-align: left;
+  cursor: pointer; border-bottom: 1px solid var(--grund-weich);
+}
+.vorschlag:hover { background: var(--blau-hell); }
+.vorschlag .land { color: var(--text-leise); font-size: 12px; }
+
+.kaestchen { display: flex; flex-wrap: wrap; gap: 5px; }
+.kaestchen label {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px;
+  padding: 4px 9px; border: 1px solid var(--rand); border-radius: 999px;
+  cursor: pointer; background: var(--grund-weich);
+}
+.kaestchen label:has(input:checked) {
+  background: var(--blau-hell); border-color: var(--blau); color: var(--blau); font-weight: 600;
+}
+.kaestchen input { accent-color: var(--blau); margin: 0; }
+
+.segmente { display: flex; gap: 5px; }
+.segmente button {
+  flex: 1; font: inherit; font-size: 13px; cursor: pointer; padding: 7px 6px;
+  border: 1px solid var(--rand); background: var(--grund); border-radius: 7px; color: var(--text-leise);
+}
+.segmente button.aktiv { background: var(--blau); border-color: var(--blau); color: #fff; font-weight: 600; }
+
+.schalter { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13px; cursor: pointer; }
+.schalter input { accent-color: var(--blau); width: 16px; height: 16px; }
+
+.korrekturen { margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-leise); }
+.korrekturen li { margin-bottom: 4px; }
+
+/* ------------------------------------------------------------ Reiter ----- */
+
+.ergebnis { padding: 0; overflow: hidden; }
+.reiter { display: flex; gap: 2px; border-bottom: 1px solid var(--rand); background: var(--grund-weich); padding: 0 6px; }
+.reiter button {
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  padding: 11px 13px; border: 0; background: none; color: var(--text-leise);
+  border-bottom: 2.5px solid transparent; margin-bottom: -1px;
+}
+.reiter button:hover { color: var(--blau); }
+.reiter button.aktiv { color: var(--blau); border-bottom-color: var(--blau); }
+.reiter-inhalt { padding: 18px 20px 24px; }
+
+.status {
+  padding: 26px; text-align: center; color: var(--text-leise); font-size: 13.5px;
+  background: var(--grund-weich); border-radius: 8px; border: 1px dashed var(--rand);
+}
+.status.laeuft { color: var(--blau); border-color: var(--blau); background: var(--blau-hell); }
+
+#titel { font-size: 20px; text-transform: none; letter-spacing: -.01em; margin: 0 0 8px; }
+.kommentar {
+  margin: 0 0 14px; padding: 11px 14px; background: var(--blau-hell);
+  border-left: 3px solid var(--blau); border-radius: 0 7px 7px 0; font-size: 14px;
+}
+.kommentar .herkunft { display: block; margin-top: 6px; font-size: 11.5px; color: var(--text-leise); }
+
+.kennzahlen { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.kennzahl {
+  background: var(--grund-weich); border: 1px solid var(--rand); border-radius: 8px;
+  padding: 8px 12px; min-width: 96px;
+}
+.kennzahl .wert { display: block; font-size: 18px; font-weight: 700; color: var(--blau); line-height: 1.2; }
+.kennzahl .name { display: block; font-size: 11px; color: var(--text-leise); text-transform: uppercase; letter-spacing: .04em; }
+
+/* ---------------------------------------------------------- Ansichten ---- */
+
+.stadtzeile { padding: 12px 0; border-bottom: 1px solid var(--rand); }
+.stadtzeile:last-child { border-bottom: 0; }
+.stadtkopf { display: flex; align-items: baseline; gap: 9px; margin-bottom: 7px; flex-wrap: wrap; }
+.stadtname { font-weight: 700; font-size: 15px; }
+.marke {
+  font-size: 11px; font-weight: 700; color: #fff; padding: 2px 8px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: .03em;
+}
+.treiber { font-size: 12.5px; color: var(--text-leise); }
+
+.balken-zeile { display: flex; align-items: center; gap: 10px; margin: 3px 0; font-size: 13px; }
+.balken-name { width: 158px; flex: none; color: var(--text-leise); }
+.balken-bahn { flex: 1; height: 15px; background: #eceff3; border-radius: 4px; overflow: hidden; }
+.balken-fuell { display: block; height: 15px; border-radius: 4px; min-width: 2px; transition: width .3s ease; }
+.balken-wert { width: 92px; flex: none; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.balken-wert .einheit { font-weight: 400; color: var(--text-leise); font-size: 11.5px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { background: var(--blau); color: #fff; text-align: left; padding: 8px 10px; font-size: 12px;
+     text-transform: uppercase; letter-spacing: .04em; }
+th.zahl, td.zahl { text-align: right; font-variant-numeric: tabular-nums; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--rand); }
+tbody tr:nth-child(even) td { background: var(--grund-weich); }
+td.ueber { color: #c62828; font-weight: 700; }
+
+.karten { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+.karte { border: 1px solid var(--rand); border-radius: var(--radius); overflow: hidden; background: var(--grund); }
+.karte-kopf { padding: 10px 13px; color: #fff; }
+.karte-kopf .name { font-weight: 700; font-size: 15px; }
+.karte-kopf .stufe { font-size: 11.5px; opacity: .92; }
+.karte-rumpf { padding: 10px 13px; }
+.karte-wert { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 3px 0; }
+.karte-wert .zahl { font-weight: 700; font-variant-numeric: tabular-nums; }
+.karte-fuss { padding: 7px 13px; background: var(--grund-weich); font-size: 11.5px; color: var(--text-leise); }
+
+.fehlzeile {
+  padding: 9px 12px; background: #fdf3f3; border: 1px solid #f0d5d5;
+  border-radius: 7px; color: #a33; font-size: 13px; margin: 6px 0;
+}
+
+.code {
+  background: #12305a; color: #dfe8f5; padding: 14px 16px; border-radius: 8px;
+  font-size: 12px; line-height: 1.55; overflow-x: auto; white-space: pre-wrap;
+  word-break: break-word; margin: 0; max-height: 640px; overflow-y: auto;
+}
+#regeln-anzeige { background: var(--grund-weich); color: var(--text); border: 1px solid var(--rand); }
+
+.quelle { font-size: 11.5px; color: var(--text-leise); margin-top: 18px;
+          padding-top: 10px; border-top: 1px solid var(--rand); }
+
+.fuss {
+  max-width: 1280px; margin: 0 auto; padding: 0 24px 34px;
+  font-size: 11.5px; color: var(--text-leise);
+}
+.fuss a { color: var(--blau); }

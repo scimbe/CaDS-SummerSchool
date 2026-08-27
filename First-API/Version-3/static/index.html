@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luftqualität steuern — First-API Version-3</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23204c86'/%3E%3Cpath d='M7 22h4v-7H7zm7 0h4V10h-4zm7 0h4v-4h-4z' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="kopf">
+  <div class="kopf-inhalt">
+    <h1>Luftqualität <span class="leicht">steuern</span></h1>
+    <p class="unterzeile">
+      Offene UBA-Daten über <code>infranode.dev</code>, aufbereitet in Python.
+      Ein kleines Sprachmodell darf einen <b>Plan</b> ausfüllen — mehr nicht.
+    </p>
+  </div>
+</header>
+
+<main class="raster">
+
+  <!-- ------------------------------------------------ Steuerung ---------- -->
+  <aside class="steuerung">
+
+    <section class="feld">
+      <h2>Der Hebel</h2>
+      <p class="hilfe">Wie viel Entscheidung überlässt du dem Modell?</p>
+      <div class="hebel" role="radiogroup" aria-label="Freiheitsgrad">
+        <button class="hebel-stufe" data-stufe="0" role="radio" aria-checked="false">
+          <span class="hebel-nr">0</span><span class="hebel-name">Formular</span>
+        </button>
+        <button class="hebel-stufe aktiv" data-stufe="1" role="radio" aria-checked="true">
+          <span class="hebel-nr">1</span><span class="hebel-name">Vorschlag</span>
+        </button>
+        <button class="hebel-stufe" data-stufe="2" role="radio" aria-checked="false">
+          <span class="hebel-nr">2</span><span class="hebel-name">Direkt</span>
+        </button>
+      </div>
+      <p class="hebel-erklaerung" id="hebel-text"></p>
+    </section>
+
+    <section class="feld" id="prompt-feld">
+      <h2>Anfrage</h2>
+      <textarea id="prompt" rows="3"
+        placeholder="z. B. Vergleiche Feinstaub in den drei größten Städten Bayerns"></textarea>
+      <div class="chips" id="beispiele"></div>
+      <button class="knopf knopf-haupt" id="plan-knopf">Plan erzeugen</button>
+    </section>
+
+    <section class="feld">
+      <h2>Plan</h2>
+      <p class="hilfe">Das Formular und der Plan sind dasselbe. Änderungen hier gelten.</p>
+
+      <label class="etikett" for="staedte-suche">Städte <span class="zaehler" id="staedte-zaehler"></span></label>
+      <input type="search" id="staedte-suche" placeholder="Stadt suchen …" autocomplete="off">
+      <div class="chips gewaehlt" id="staedte-gewaehlt"></div>
+      <div class="vorschlaege" id="staedte-vorschlaege" hidden></div>
+
+      <label class="etikett">Schadstoffe</label>
+      <div class="kaestchen" id="schadstoffe"></div>
+
+      <label class="etikett" for="sortierung">Sortierung</label>
+      <select id="sortierung">
+        <option value="belastung_absteigend">Belastung, absteigend</option>
+        <option value="belastung_aufsteigend">Belastung, aufsteigend</option>
+        <option value="name">Name</option>
+      </select>
+
+      <label class="etikett">Darstellung</label>
+      <div class="segmente" id="darstellung">
+        <button data-wert="balken" class="aktiv">Balken</button>
+        <button data-wert="tabelle">Tabelle</button>
+        <button data-wert="karten">Karten</button>
+      </div>
+
+      <label class="schalter">
+        <input type="checkbox" id="kommentar">
+        <span>Einordnung vom Modell schreiben lassen</span>
+      </label>
+
+      <button class="knopf knopf-haupt" id="run-knopf">Ausführen</button>
+    </section>
+
+    <section class="feld" id="korrektur-feld" hidden>
+      <h2>Was das Harness korrigiert hat</h2>
+      <ul class="korrekturen" id="korrekturen"></ul>
+    </section>
+
+  </aside>
+
+  <!-- ------------------------------------------------ Ergebnis ----------- -->
+  <section class="ergebnis">
+
+    <nav class="reiter">
+      <button class="aktiv" data-reiter="ansicht">Ergebnis</button>
+      <button data-reiter="plan-json">Plan als JSON</button>
+      <button data-reiter="rohdaten">Rohdaten</button>
+      <button data-reiter="regeln">Regeln des Harness</button>
+    </nav>
+
+    <div class="reiter-inhalt" id="ansicht">
+      <div id="status" class="status">Wähle links etwas aus oder stelle eine Anfrage.</div>
+      <h2 id="titel" hidden></h2>
+      <p id="kommentar-text" class="kommentar" hidden></p>
+      <div id="kennzahlen" class="kennzahlen"></div>
+      <div id="darstellung-ziel"></div>
+      <p class="quelle" id="quelle" hidden></p>
+    </div>
+
+    <div class="reiter-inhalt" id="plan-json" hidden>
+      <p class="hilfe">Genau dieses Objekt schickt die Oberfläche an den Server.
+      Es ist alles, was das Modell erzeugen darf.</p>
+      <pre id="plan-anzeige" class="code"></pre>
+    </div>
+
+    <div class="reiter-inhalt" id="rohdaten" hidden>
+      <p class="hilfe">Die unveränderten Antworten der API — zur Kontrolle jeder
+      Zahl in der Ansicht.</p>
+      <pre id="rohdaten-anzeige" class="code">Noch nichts abgerufen.</pre>
+    </div>
+
+    <div class="reiter-inhalt" id="regeln" hidden>
+      <p class="hilfe">Diese Datei liest <code>planner.py</code> beim Start ein.
+      Sie ist die Beschreibung des Verhaltens, nicht nur Dokumentation.</p>
+      <pre id="regeln-anzeige" class="code">Wird geladen …</pre>
+    </div>
+
+  </section>
+</main>
+
+<footer class="fuss">
+  Datenquelle: Umweltbundesamt (UBA), Lizenz
+  <a href="https://www.govdata.de/dl-de/by-2-0">DL-DE BY 2.0</a>, bereitgestellt über
+  infranode.dev · Einzelmesswerte einer Station sind nicht mit Jahresmittelwerten
+  vergleichbar · CaDS Summer School — First-API, Version-3
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

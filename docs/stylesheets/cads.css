@@ -1,0 +1,57 @@
+/* Doku-Thema der CaDS Summer School.
+ *
+ * Dieselbe Palette wie die Oberfläche in Version-3: das tiefe Blau der
+ * CaDS-Wortmarke, das helle Blau und das Olivgrün der Zeile darunter. Doku und
+ * Anwendung sollen erkennbar zusammengehören.
+ */
+
+:root {
+  --cads-blau: #204c86;
+  --cads-blau-dunkel: #12305a;
+  --cads-hell: #b5c4d8;
+  --cads-mittel: #8fa6c4;
+  --cads-gruen: #9cb33b;
+
+  --md-primary-fg-color: var(--cads-blau);
+  --md-primary-fg-color--light: var(--cads-mittel);
+  --md-primary-fg-color--dark: var(--cads-blau-dunkel);
+  --md-accent-fg-color: var(--cads-gruen);
+  --md-typeset-a-color: var(--cads-blau);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: var(--cads-blau-dunkel);
+  --md-accent-fg-color: var(--cads-gruen);
+  --md-typeset-a-color: var(--cads-hell);
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--cads-blau);
+  color: #fff;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background-color: var(--cads-blau-dunkel);
+}
+
+/* Tabellen mit Messwerten oder Feldlisten dürfen nicht umbrechen. */
+.md-typeset table:not([class]) {
+  display: block;
+  overflow-x: auto;
+}
+
+.md-typeset code { font-size: 0.85em; }
+
+/* Für Aussagen, die an dieser konkreten Installation gemessen wurden -
+   die Unterscheidung zwischen "gemessen" und "überlegt" ist hier wichtig. */
+.gemessen {
+  border-left: 4px solid var(--cads-gruen);
+  padding: 0.6rem 1rem;
+  background: rgba(156, 179, 59, 0.08);
+  border-radius: 0 4px 4px 0;
+}
+
+.md-header__topic .md-ellipsis {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
