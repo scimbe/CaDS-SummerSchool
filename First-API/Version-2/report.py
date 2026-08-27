@@ -87,8 +87,8 @@ def _stadt_block(stadt: dict, text: str) -> str:
         for w in stadt["werte"]
     )
     hinweis = ""
-    if stadt["grenzwert_überschreitungen"]:
-        hinweis = f'<p class="warn">Über EU-Grenzwert: {_e(", ".join(stadt["grenzwert_überschreitungen"]))}</p>'
+    if stadt["grenzwert_ueberschreitungen"]:
+        hinweis = f'<p class="warn">Über EU-Grenzwert: {_e(", ".join(stadt["grenzwert_ueberschreitungen"]))}</p>'
     return (
         f'<div class="stadt"><h3>{_e(stadt["name"])} {_badge(stadt["gesamtstufe"])}</h3>'
         f"<p>{_e(text)}</p>{balken}{hinweis}</div>"
@@ -101,23 +101,23 @@ def _anhang(roh: list[dict]) -> str:
     Ohne diesen Anhang müsste man dem Bericht glauben. Mit ihm kann man
     nachrechnen: Messwert im Anhang, Einstufung in der Tabelle, Satz im Text.
     """
-    blöcke = []
+    bloecke = []
     for eintrag in roh:
         url = f"{BASE}/{eintrag['slug']}/air-uba"
         inhalt = json.dumps(eintrag, indent=2, ensure_ascii=False, sort_keys=True)
-        blöcke.append(
+        bloecke.append(
             f'<div class="roh-titel">{_e(eintrag["slug"])}</div>'
             f'<div class="roh-url">GET {_e(url)}</div>'
             f'<div class="roh">{_e(inhalt)}</div>'
         )
-    return "".join(blöcke) or '<p class="sub">Keine Rohdaten übergeben.</p>'
+    return "".join(bloecke) or '<p class="sub">Keine Rohdaten übergeben.</p>'
 
 
-def baue_html(vgl: dict, städte: list[dict], texte: dict, protokolle: list[dict],
+def baue_html(vgl: dict, staedte: list[dict], texte: dict, protokolle: list[dict],
               attribution: dict, roh: list[dict] | None = None) -> str:
     jetzt = datetime.now(timezone.utc).astimezone()
-    gültig = [s for s in städte if s["ok"]]
-    stand = gültig[0]["observed_at"] if gültig else "-"
+    gueltig = [s for s in staedte if s["ok"]]
+    stand = gueltig[0]["observed_at"] if gueltig else "-"
 
     rang_zeilen = "".join(
         f"<tr><td>{e['platz']}</td><td>{_e(e['name'])}</td><td>{_badge(e['stufe'])}</td>"
@@ -125,8 +125,8 @@ def baue_html(vgl: dict, städte: list[dict], texte: dict, protokolle: list[dict
         for e in vgl["rangliste"]
     )
 
-    stadt_blöcke = "".join(
-        _stadt_block(s, texte.get(s["slug"], "")) for s in gültig
+    stadt_bloecke = "".join(
+        _stadt_block(s, texte.get(s["slug"], "")) for s in gueltig
     )
 
     fehler = ""
@@ -169,7 +169,7 @@ Städte vergleichbar, die bei gleicher Stufe unterschiedlich nah an ihr liegen, 
 er ist der einzige Grund, warum die Reihenfolge hier nicht alphabetisch ist.</p>
 
 <h2>Die Städte im Einzelnen</h2>
-{stadt_blöcke}
+{stadt_bloecke}
 
 <div class="herkunft">
 <h2>Wie dieser Bericht entstanden ist</h2>

@@ -23,13 +23,13 @@ AUSGABE = Path(__file__).parent / "output"
 
 
 def main() -> int:
-    städte_slugs = sys.argv[1:] or STANDARD
+    staedte_slugs = sys.argv[1:] or STANDARD
     AUSGABE.mkdir(exist_ok=True)
     start = time.time()
 
     # --- 1. Daten holen ------------------------------------------------------
-    print(f"[1/5] Luftdaten holen für: {', '.join(städte_slugs)}")
-    roh = fetch_cities(städte_slugs)
+    print(f"[1/5] Luftdaten holen für: {', '.join(staedte_slugs)}")
+    roh = fetch_cities(staedte_slugs)
     for r in roh:
         status = "FEHLER: " + r["error"] if "error" in r else f"{len(r['messwerte'])} Messwerte"
         print(f"      {r['slug']:<12} {status}")
@@ -82,9 +82,9 @@ def main() -> int:
 
     print()
     if erfolg:
-        größe = pdf_datei.stat().st_size // 1024
+        groesse = pdf_datei.stat().st_size // 1024
         print(f"Fertig in {time.time() - start:.1f}s -> {_kurz(pdf_datei)}  "
-              f"({größe} KB, via {werkzeug})")
+              f"({groesse} KB, via {werkzeug})")
     else:
         print(f"Kein PDF-Werkzeug gefunden. HTML liegt hier: {_kurz(html_datei)}")
         print("Im Browser öffnen und 'Als PDF sichern' wählen.")

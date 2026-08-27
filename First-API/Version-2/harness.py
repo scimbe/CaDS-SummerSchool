@@ -127,7 +127,7 @@ def erlaubte_zahlen(*werte, mit_messwerten: bool = True) -> set[str]:
     return erlaubt
 
 
-def prüfe_text(text: str, erlaubt: set[str]) -> list[str]:
+def pruefe_text(text: str, erlaubt: set[str]) -> list[str]:
     """Gibt die Zahlen zurück, die im Text stehen, aber nicht in den Daten."""
     gefunden = {_normalisieren(t) for t in ZAHL.findall(text)}
     return sorted(gefunden - erlaubt)
@@ -157,19 +157,19 @@ def schreibe_abschnitt(auftrag: str, daten, notfalltext: str, *,
             return notfalltext, protokoll
 
         text = re.sub(r"^#+ .*$", "", text, flags=re.MULTILINE).strip()
-        verstöße = prüfe_text(text, erlaubt)
+        verstoesse = pruefe_text(text, erlaubt)
 
-        if not verstöße:
+        if not verstoesse:
             return text, protokoll
 
-        protokoll["beanstandet"].append(verstöße)
+        protokoll["beanstandet"].append(verstoesse)
         verlauf += [
             {"role": "assistant", "content": text},
             {"role": "user", "content": (
                 ("Der Abschnitt darf überhaupt keine Messwerte enthalten. Diese Zahlen "
                  "müssen raus: " if not mit_messwerten else
                  "Diese Zahlen stehen nicht in den Daten: ")
-                + ", ".join(verstöße)
+                + ", ".join(verstoesse)
                 + ". Schreibe den Abschnitt neu."
             )},
         ]
@@ -187,17 +187,17 @@ def auftrag_kurzfassung(vgl: dict) -> str:
         f"ausschlaggebend {e['treiber']}"
         for e in vgl["rangliste"]
     ]
-    über = (
+    ueber = (
         "Über einem EU-Grenzwert liegen: "
-        + "; ".join(f"{a['stadt']} bei {', '.join(a['schadstoffe'])}" for a in vgl["auffällig"])
-        if vgl["auffällig"] else "Keine Stadt liegt über einem EU-Grenzwert."
+        + "; ".join(f"{a['stadt']} bei {', '.join(a['schadstoffe'])}" for a in vgl["auffaellig"])
+        if vgl["auffaellig"] else "Keine Stadt liegt über einem EU-Grenzwert."
     )
     return (
         "Schreibe die Kurzfassung eines Luftqualitätsberichts, 3 bis 4 Sätze.\n\n"
         f"Untersuchte Städte. Platz 1 ist die am STÄRKSTEN belastete Stadt, "
         f"der letzte Platz die am GERINGSTEN belastete:\n"
         + "\n".join(zeilen)
-        + f"\n{über}"
+        + f"\n{ueber}"
         + f"\n\nAm stärksten belastet ist {vgl['schlechtestes']}, am geringsten "
           f"{vgl['bestes']}. Nenne beide beim Namen und sage, welcher Schadstoff "
           "das Bild bestimmt.\n"
@@ -210,7 +210,7 @@ def auftrag_kurzfassung(vgl: dict) -> str:
 def auftrag_stadt(stadt: dict) -> str:
     werte = "\n".join(
         f"- {w['name']}: {w['wert']} {w['einheit']} -> Stufe '{w['stufe']}'"
-        + (f" (EU-Grenzwert {w['eu_grenzwert']} µg/m³ überschritten)" if w["über_grenzwert"] else "")
+        + (f" (EU-Grenzwert {w['eu_grenzwert']} µg/m³ überschritten)" if w["ueber_grenzwert"] else "")
         for w in stadt["werte"]
     )
     fehlend = (
@@ -235,9 +235,9 @@ def notfall_kurzfassung(vgl: dict) -> str:
         f"{vgl['bestes']}, die schlechteste {vgl['schlechtestes']}. "
         + (
             "Kein Messwert liegt über einem EU-Grenzwert."
-            if not vgl["auffällig"]
+            if not vgl["auffaellig"]
             else "Grenzwertüberschreitungen: "
-            + "; ".join(f"{a['stadt']} ({', '.join(a['schadstoffe'])})" for a in vgl["auffällig"])
+            + "; ".join(f"{a['stadt']} ({', '.join(a['schadstoffe'])})" for a in vgl["auffaellig"])
             + "."
         )
     )

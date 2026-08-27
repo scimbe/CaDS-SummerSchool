@@ -76,14 +76,22 @@ python3 server.py
 ## Port schon belegt
 
 ```
-OSError: [Errno 48] Address already in use
+Port 8000 ist schon belegt.
+
+Wer ihn hält:
+    lsof -nP -iTCP:8000 -sTCP:LISTEN
+
+Anderen Port nehmen:
+    python3 server.py 8001
 ```
 
-Anderen Port nehmen — `python3 server.py 8080` — oder nachsehen, wer den Port
-hält:
+Port 8000 ist ein beliebter Standard — ein vergessenes `python3 -m http.server`
+aus einer anderen Sitzung hält ihn genauso gut. Erst nachsehen, wer ihn hält,
+dann entscheiden: beenden oder ausweichen.
 
 ```bash
-lsof -nP -iTCP:8000 -sTCP:LISTEN
+lsof -nP -iTCP:8000 -sTCP:LISTEN     # zeigt PID und Programm
+kill <PID>                           # nur, wenn es wirklich der eigene Prozess ist
 ```
 
 ## Umlaute erscheinen als Fragezeichen

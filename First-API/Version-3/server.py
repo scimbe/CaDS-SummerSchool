@@ -85,11 +85,11 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(rumpf)
 
     def _eingang(self) -> dict:
-        länge = int(self.headers.get("Content-Length") or 0)
-        if not länge:
+        laenge = int(self.headers.get("Content-Length") or 0)
+        if not laenge:
             return {}
         try:
-            return json.loads(self.rfile.read(länge))
+            return json.loads(self.rfile.read(laenge))
         except json.JSONDecodeError:
             return {}
 
@@ -134,15 +134,30 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"fehler": "unbekannter Pfad"}, 404)
 
 
-def main() -> None:
+def main() -> int:
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+
+    try:
+        server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    except OSError as fehler:
+        # Errno 48 (macOS) bzw. 98 (Linux): Der Port ist belegt. Das passiert oft
+        # genug, dass ein Traceback hier nur im Weg steht.
+        if fehler.errno not in (48, 98):
+            raise
+        print(f"Port {port} ist schon belegt.\n")
+        print("Wer ihn hält:")
+        print(f"    lsof -nP -iTCP:{port} -sTCP:LISTEN\n")
+        print("Anderen Port nehmen:")
+        print(f"    python3 server.py {port + 1}")
+        return 1
+
     print(f"Oberfläche läuft auf http://localhost:{port}  (Strg+C beendet)")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         print("\nBeendet.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

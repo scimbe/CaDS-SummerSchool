@@ -306,8 +306,8 @@ def kommentieren(zeilen: list[dict], kennzahlen: dict) -> dict:
     Namen gehören (PM10, PM2.5, NO₂, O₃, SO₂). Dadurch ist die Prüfung eine
     einfache Ja/Nein-Frage statt eines Abgleichs mit den Daten.
     """
-    gültig = [z for z in zeilen if z["ok"]]
-    if not gültig:
+    gueltig = [z for z in zeilen if z["ok"]]
+    if not gueltig:
         return {"text": "", "protokoll": ["Keine Daten — kein Kommentar."], "quelle": "keiner"}
 
     erlaubt = {"10", "2.5", "2", "3", "5"} | {str(n) for n in range(0, 13)}
@@ -316,9 +316,9 @@ def kommentieren(zeilen: list[dict], kennzahlen: dict) -> dict:
         "Auswertung:\n"
         + "\n".join(
             f"- {z['name']}: Stufe '{z['stufe']}', ausschlaggebend {z['treiber']}"
-            for z in gültig
+            for z in gueltig
         )
-        + f"\n\nAm stärksten belastet: {gültig[0]['name']}."
+        + f"\n\nAm stärksten belastet: {gueltig[0]['name']}."
         + (
             "\nÜber einem EU-Grenzwert: "
             + "; ".join(f"{e['stadt']} ({', '.join(e['schadstoffe'])})" for e in kennzahlen["ueber_eu"])
@@ -327,8 +327,8 @@ def kommentieren(zeilen: list[dict], kennzahlen: dict) -> dict:
     )
 
     notfall = (
-        f"Am stärksten belastet ist {gültig[0]['name']}, ausschlaggebend ist dort "
-        f"{gültig[0]['treiber']}. "
+        f"Am stärksten belastet ist {gueltig[0]['name']}, ausschlaggebend ist dort "
+        f"{gueltig[0]['treiber']}. "
         + ("Keine der Städte liegt über einem EU-Grenzwert."
            if not kennzahlen.get("ueber_eu") else
            "Mindestens eine Stadt liegt über einem EU-Grenzwert.")
@@ -345,16 +345,16 @@ def kommentieren(zeilen: list[dict], kennzahlen: dict) -> dict:
             return {"text": notfall, "protokoll": protokoll, "quelle": "harness"}
 
         text = re.sub(r"^#+ .*$", "", text, flags=re.MULTILINE).strip()
-        verstöße = sorted({z.replace(",", ".") for z in ZAHL.findall(text)} - erlaubt)
-        if not verstöße:
+        verstoesse = sorted({z.replace(",", ".") for z in ZAHL.findall(text)} - erlaubt)
+        if not verstoesse:
             return {"text": text, "protokoll": protokoll, "quelle": "modell"}
 
-        protokoll.append(f"Zahlen im Kommentar verworfen: {', '.join(verstöße)}.")
+        protokoll.append(f"Zahlen im Kommentar verworfen: {', '.join(verstoesse)}.")
         verlauf += [
             {"role": "assistant", "content": text},
             {"role": "user", "content":
                 "Der Kommentar darf keine Messzahlen enthalten. Diese müssen raus: "
-                + ", ".join(verstöße) + ". Schreibe ihn neu."},
+                + ", ".join(verstoesse) + ". Schreibe ihn neu."},
         ]
 
     protokoll.append("Kein zahlenfreier Kommentar zustande gekommen — Harness-Text eingesetzt.")

@@ -72,31 +72,31 @@ def stadt_auswerten(rohdaten: dict) -> dict:
         return {"slug": rohdaten["slug"], "ok": False, "fehler": rohdaten["error"]}
 
     werte = []
-    for schlüssel, wert in rohdaten["messwerte"].items():
-        name, einheit = SCHADSTOFFE[schlüssel]
-        stufe = einstufen(schlüssel, wert)
-        grenzwert = EU_GRENZWERTE.get(schlüssel)
+    for schluessel, wert in rohdaten["messwerte"].items():
+        name, einheit = SCHADSTOFFE[schluessel]
+        stufe = einstufen(schluessel, wert)
+        grenzwert = EU_GRENZWERTE.get(schluessel)
         werte.append({
-            "schlüssel": schlüssel,
+            "schluessel": schluessel,
             "name": name,
             "wert": wert,
             "einheit": einheit,
             "stufe": stufe,
             "stufe_index": INDEX_STUFEN.index(stufe) if stufe in INDEX_STUFEN else -1,
             "eu_grenzwert": grenzwert,
-            "über_grenzwert": bool(grenzwert and wert > grenzwert),
+            "ueber_grenzwert": bool(grenzwert and wert > grenzwert),
             # Zwei Bezugsgrößen für die Balkenlänge, beide in Prozent und bei 100
             # gedeckelt. Welche im Report gilt, steht in HARNESS.md unter
             # "balken_bezug". Die Wahl ändert die Aussage der Grafik erheblich:
             # "index" zeigt den Abstand zum Extremfall, "grenzwert" den zur
             # rechtlichen Grenze - bei der zweiten schlagen die Balken viel weiter aus.
-            "balken_index": min(100, round(wert / SCHWELLEN[schlüssel][-1] * 100)),
+            "balken_index": min(100, round(wert / SCHWELLEN[schluessel][-1] * 100)),
             "balken_grenzwert": min(100, round(wert / grenzwert * 100)) if grenzwert else
-                                min(100, round(wert / SCHWELLEN[schlüssel][-1] * 100)),
+                                min(100, round(wert / SCHWELLEN[schluessel][-1] * 100)),
             # Belastung relativ zur Obergrenze der Stufe "gut". 1.0 heißt: genau
             # an der Grenze zu "mäßig". Erst das macht Schadstoffe vergleichbar -
             # 79 µg/m³ Ozon und 23 µg/m³ Feinstaub sind sonst zwei Zahlen ohne Bezug.
-            "belastung": round(wert / SCHWELLEN[schlüssel][1], 2),
+            "belastung": round(wert / SCHWELLEN[schluessel][1], 2),
         })
 
     if not werte:
@@ -121,28 +121,28 @@ def stadt_auswerten(rohdaten: dict) -> dict:
         "fehlende_schadstoffe": [
             SCHADSTOFFE[k][0] for k in SCHADSTOFFE if k not in rohdaten["messwerte"]
         ],
-        "grenzwert_überschreitungen": [w["name"] for w in werte if w["über_grenzwert"]],
+        "grenzwert_ueberschreitungen": [w["name"] for w in werte if w["ueber_grenzwert"]],
     }
 
 
-def vergleich(städte: list[dict]) -> dict:
+def vergleich(staedte: list[dict]) -> dict:
     """Rangfolge und Kennzahlen über alle Städte - ebenfalls reine Rechnung."""
-    gültig = [s for s in städte if s["ok"]]
-    if not gültig:
-        return {"anzahl": 0, "rangliste": [], "auffällig": []}
+    gueltig = [s for s in staedte if s["ok"]]
+    if not gueltig:
+        return {"anzahl": 0, "rangliste": [], "auffaellig": []}
 
     rangliste = sorted(
-        gültig,
+        gueltig,
         key=lambda s: (-s["gesamtstufe_index"], -s["belastungsindex"], s["name"]),
     )
 
-    def mittel(schlüssel: str) -> float | None:
-        werte = [w["wert"] for s in gültig for w in s["werte"] if w["schlüssel"] == schlüssel]
+    def mittel(schluessel: str) -> float | None:
+        werte = [w["wert"] for s in gueltig for w in s["werte"] if w["schluessel"] == schluessel]
         return round(sum(werte) / len(werte), 1) if werte else None
 
     return {
-        "anzahl": len(gültig),
-        "fehlgeschlagen": [s["slug"] for s in städte if not s["ok"]],
+        "anzahl": len(gueltig),
+        "fehlgeschlagen": [s["slug"] for s in staedte if not s["ok"]],
         "rangliste": [
             {"platz": i, "name": s["name"], "stufe": s["gesamtstufe"],
              "treiber": s["treiber"], "belastungsindex": s["belastungsindex"]}
@@ -151,9 +151,9 @@ def vergleich(städte: list[dict]) -> dict:
         "bestes": rangliste[-1]["name"],
         "schlechtestes": rangliste[0]["name"],
         "mittelwerte": {k: mittel(k) for k in SCHADSTOFFE},
-        "auffällig": [
-            {"stadt": s["name"], "schadstoffe": s["grenzwert_überschreitungen"]}
-            for s in gültig if s["grenzwert_überschreitungen"]
+        "auffaellig": [
+            {"stadt": s["name"], "schadstoffe": s["grenzwert_ueberschreitungen"]}
+            for s in gueltig if s["grenzwert_ueberschreitungen"]
         ],
     }
 
